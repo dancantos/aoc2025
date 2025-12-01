@@ -1,9 +1,10 @@
 import sys
 
 def parse_input(file):
-    sig = lambda char : 1 if char == 'R' else -1
+    sign = lambda char : 1 if char == 'R' else -1
+    split = lambda instruction : (sign(instruction[0]), int(instruction[1:]))
     with open(file, "r") as f:
-        return [ -1*sign*num for sign, num in [ (sig(line[0]), int(line[1:])) for line in f if len(line.strip()) > 0 ] ]
+        return [ -1*sign*num for sign, num in [ split(line.strip()) for line in f if len(line) > 0 ] ]
 
 def count_zero(moves, start=50, count=0):
     for turn in moves:
