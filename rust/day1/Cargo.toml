@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 aocio = { path = "../aocio" }
+criterion = "0.8.0"
