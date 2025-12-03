@@ -145,6 +145,7 @@ func _digits(n int) int {
 func buildCandidate(n, digits, totalDigits, e int) int {
 	candidate := 0
 	exp := 1
+
 	for d := 0; d < totalDigits/digits; d++ {
 		candidate += n * exp
 		exp *= e
