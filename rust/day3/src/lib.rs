@@ -1,6 +1,6 @@
 use aocio::read_lines;
 
-pub fn puzzle<F : Fn(&[i64]) -> i64>(banks: &Vec<Vec<i64>>, f: F) -> i64 {
+pub fn puzzle<F : Fn(&[i64]) -> i64>(banks: Vec<Vec<i64>>, f: F) -> i64 {
     let mut sum: i64 = 0;
     for bank in banks {
         sum = sum + f(&bank);
@@ -34,7 +34,7 @@ fn _largest_joltage2(bank: &[i64], size: u32, result: i64) -> i64 {
     }
     let mut high = bank[0];
     let mut index = 0;
-    for i in 1..bank.len()-(size as usize)+1 {
+    for i in 1..=bank.len()-(size as usize) {
         if bank[i] > high {
             high = bank[i];
             index = i;
