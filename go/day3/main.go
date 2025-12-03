@@ -47,9 +47,6 @@ func _findLargestJoltage2(bank []int, size int, current []int) []int {
 	if size == 0 {
 		return current
 	}
-	if size == 1 {
-		return append(current, _max(bank))
-	}
 	high, index := bank[0], 0
 	for i := 1; i <= len(bank)-size; i++ {
 		if bank[i] > high {
