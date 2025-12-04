@@ -40,7 +40,7 @@ func BenchmarkPuzzle2(b *testing.B) {
 	b.Run("puzzle", func(b *testing.B) {
 		for b.Loop() {
 			b.StopTimer()
-			input := input.clone()
+			input := input.Clone()
 			b.StartTimer()
 			result = puzzle2(input)
 		}
@@ -49,7 +49,7 @@ func BenchmarkPuzzle2(b *testing.B) {
 	b.Run("bonus", func(b *testing.B) {
 		for b.Loop() {
 			b.StopTimer()
-			bonus := bonus.clone()
+			bonus := bonus.Clone()
 			b.StartTimer()
 			result = puzzle2(bonus)
 		}
@@ -69,7 +69,7 @@ func BenchmarkPuzzle2Better(b *testing.B) {
 	b.Run("puzzle", func(b *testing.B) {
 		for b.Loop() {
 			b.StopTimer()
-			input := input.clone()
+			input := input.Clone()
 			b.StartTimer()
 			result = puzzle2Better(input)
 		}
@@ -78,7 +78,7 @@ func BenchmarkPuzzle2Better(b *testing.B) {
 	b.Run("bonus", func(b *testing.B) {
 		for b.Loop() {
 			b.StopTimer()
-			bonus := bonus.clone()
+			bonus := bonus.Clone()
 			b.StartTimer()
 			result = puzzle2Better(bonus)
 		}
