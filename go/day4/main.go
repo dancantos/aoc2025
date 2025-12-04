@@ -5,25 +5,27 @@ import (
 	"fmt"
 	"io"
 	"iter"
+	"maps"
 	"os"
 	"slices"
 )
 
 func main() {
-	grid := read("input/day4/puzzle.txt")
-	fmt.Println("puzzle1:", puzzle1(grid))
-	fmt.Println("puzzle2:", puzzle2(grid))
+	grid := read("input/day4/bonus.txt")
+	fmt.Println("puzzle1:", puzzle1(grid.clone()))
+	fmt.Println("puzzle2:", puzzle2(grid.clone()))
+	fmt.Println("puzzle2:", puzzle2Better(grid.clone()))
 }
 
 func puzzle1(grid Grid[int]) int {
 	result := 0
-	for x, y := range grid.coords() {
-		if grid.get(x, y) == 0 {
+	for p, n := range grid.All() {
+		if n == 0 {
 			continue
 		}
 
 		count := 0
-		for n := range grid.neighbors(x, y) {
+		for _, n := range grid.neighbors(p.x, p.y) {
 			count += n
 		}
 
@@ -35,22 +37,21 @@ func puzzle1(grid Grid[int]) int {
 }
 
 func puzzle2(grid Grid[int]) int {
-	// init all memory needed
 	iter := func(g Grid[int]) int {
 		remCount := 0
-		for x, y := range g.coords() {
-			if g.get(x, y) == 0 {
+		for p, n := range g.All() {
+			if n == 0 {
 				continue
 			}
 
 			count := 0
-			for n := range g.neighbors(x, y) {
+			for _, n := range g.neighbors(p.x, p.y) {
 				count += n
 			}
 
 			if count < 4 {
 				remCount += 1
-				g.set(x, y, 0)
+				g.set(p.x, p.y, 0)
 			}
 		}
 		return remCount
@@ -66,6 +67,62 @@ func puzzle2(grid Grid[int]) int {
 	}
 
 	return totalRemoved
+}
+
+func puzzle2Better(grid Grid[int]) int {
+	horizon := map[Vec2]struct{}{}
+	remCount := 0
+
+	// initial pass
+	for p, n := range grid.All() {
+		if n == 0 {
+			continue
+		}
+		count := 0
+		for _, n := range grid.neighbors(p.x, p.y) {
+			count += n
+		}
+
+		if count < 4 {
+			remCount += 1
+			grid.set(p.x, p.y, 0)
+			for p, n := range grid.neighbors(p.x, p.y) {
+				if n != 0 {
+					horizon[p] = struct{}{}
+				}
+			}
+		}
+	}
+
+	// horizon loop
+	var p Vec2
+	for len(horizon) > 0 {
+		// convoluted way to get single elem from map
+		maps.Keys(horizon)(func(extract Vec2) bool {
+			p = extract
+			return false
+		})
+		delete(horizon, p)
+
+		if grid.get(p.x, p.y) == 0 {
+			continue
+		}
+
+		count := 0
+		for _, n := range grid.neighbors(p.x, p.y) {
+			count += n
+		}
+		if count < 4 {
+			remCount += 1
+			grid.set(p.x, p.y, 0)
+			for ph, n := range grid.neighbors(p.x, p.y) {
+				if n != 0 {
+					horizon[ph] = struct{}{}
+				}
+			}
+		}
+	}
+	return remCount
 }
 
 func read(filename string) Grid[int] {
@@ -89,16 +146,18 @@ func read(filename string) Grid[int] {
 	return NewGrid(result)
 }
 
+type Vec2 struct{ x, y int }
+
 type Grid[T any] struct {
-	grid       [][]T
-	xmax, ymax int
+	grid   [][]T
+	bounds Vec2
 }
 
-func (g Grid[T]) coords() iter.Seq2[int, int] {
-	return func(yield func(int, int) bool) {
-		for y := 0; y < g.ymax; y++ {
-			for x := 0; x < g.xmax; x++ {
-				if !yield(x, y) {
+func (g Grid[T]) All() iter.Seq2[Vec2, T] {
+	return func(yield func(Vec2, T) bool) {
+		for y := 0; y < g.bounds.y; y++ {
+			for x := 0; x < g.bounds.x; x++ {
+				if !yield(Vec2{x, y}, g.grid[y][x]) {
 					return
 				}
 			}
@@ -115,11 +174,11 @@ func (g Grid[T]) set(x, y int, val T) {
 }
 
 func (g Grid[T]) clone() Grid[T] {
-	newGrid := make([][]T, 0, g.ymax)
+	newGrid := make([][]T, 0, g.bounds.y)
 	for _, row := range g.grid {
 		newGrid = append(newGrid, slices.Clone(row))
 	}
-	return Grid[T]{newGrid, g.xmax, g.ymax}
+	return Grid[T]{newGrid, g.bounds}
 }
 
 func copyGrid[T any](dst, src Grid[T]) {
@@ -137,46 +196,46 @@ func (g Grid[T]) Print(out io.Writer) {
 	}
 }
 
-func (g Grid[T]) neighbors(x, y int) iter.Seq[T] {
-	return func(yield func(T) bool) {
+func (g Grid[T]) neighbors(x, y int) iter.Seq2[Vec2, T] {
+	return func(yield func(Vec2, T) bool) {
 		if x > 0 {
-			if !yield(g.get(x-1, y)) {
+			if !yield(Vec2{x - 1, y}, g.get(x-1, y)) {
 				return
 			}
 		}
-		if x < g.xmax-1 {
-			if !yield(g.get(x+1, y)) {
+		if x < g.bounds.x-1 {
+			if !yield(Vec2{x + 1, y}, g.get(x+1, y)) {
 				return
 			}
 		}
 		if y > 0 {
-			if !yield(g.get(x, y-1)) {
+			if !yield(Vec2{x, y - 1}, g.get(x, y-1)) {
 				return
 			}
 		}
-		if y < g.ymax-1 {
-			if !yield(g.get(x, y+1)) {
+		if y < g.bounds.y-1 {
+			if !yield(Vec2{x, y + 1}, g.get(x, y+1)) {
 				return
 			}
 		}
 
 		if x > 0 && y > 0 {
-			if !yield(g.get(x-1, y-1)) {
+			if !yield(Vec2{x - 1, y - 1}, g.get(x-1, y-1)) {
 				return
 			}
 		}
-		if x < g.xmax-1 && y > 0 {
-			if !yield(g.get(x+1, y-1)) {
+		if x < g.bounds.x-1 && y > 0 {
+			if !yield(Vec2{x + 1, y - 1}, g.get(x+1, y-1)) {
 				return
 			}
 		}
-		if x > 0 && y < g.ymax-1 {
-			if !yield(g.get(x-1, y+1)) {
+		if x > 0 && y < g.bounds.y-1 {
+			if !yield(Vec2{x - 1, y + 1}, g.get(x-1, y+1)) {
 				return
 			}
 		}
-		if x < g.xmax-1 && y < g.ymax-1 {
-			if !yield(g.get(x+1, y+1)) {
+		if x < g.bounds.x-1 && y < g.bounds.y-1 {
+			if !yield(Vec2{x + 1, y + 1}, g.get(x+1, y+1)) {
 				return
 			}
 		}
@@ -186,9 +245,8 @@ func (g Grid[T]) neighbors(x, y int) iter.Seq[T] {
 
 func NewGrid[T any](input [][]T) Grid[T] {
 	return Grid[T]{
-		grid: input,
-		xmax: len(input[0]),
-		ymax: len(input),
+		grid:   input,
+		bounds: Vec2{len(input[0]), len(input)},
 	}
 }
 
@@ -197,5 +255,5 @@ func NewGridxy[T any](x, y int) Grid[T] {
 	for i := 0; i < y; i++ {
 		grid = append(grid, make([]T, x))
 	}
-	return Grid[T]{grid, x, y}
+	return Grid[T]{grid, Vec2{x, y}}
 }
