@@ -36,11 +36,7 @@ func puzzle1(grid Grid[int]) int {
 
 func puzzle2(grid Grid[int]) int {
 	// init all memory needed
-	auxGrid := grid.clone()
-	var tmpGrid Grid[int]
-
-	iter := func(g Grid[int]) (int, Grid[int]) {
-		copyGrid(auxGrid, grid)
+	iter := func(g Grid[int]) int {
 		remCount := 0
 		for x, y := range g.coords() {
 			if g.get(x, y) == 0 {
@@ -54,16 +50,15 @@ func puzzle2(grid Grid[int]) int {
 
 			if count < 4 {
 				remCount += 1
-				auxGrid.set(x, y, 0)
+				g.set(x, y, 0)
 			}
 		}
-		return remCount, auxGrid
+		return remCount
 	}
 
 	var remCount, totalRemoved int
 	for {
-		remCount, tmpGrid = iter(grid)
-		copyGrid(grid, tmpGrid)
+		remCount = iter(grid)
 		if remCount == 0 {
 			break
 		}
