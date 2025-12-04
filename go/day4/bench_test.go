@@ -23,7 +23,7 @@ func BenchmarkPuzzle1(b *testing.B) {
 // goarch: arm64
 // pkg: github.com/dancantos/aoc2025/go/day4
 // cpu: Apple M4 Pro
-// BenchmarkPuzzle2-12    	     252	   4600431 ns/op	10720623 B/op	    9174 allocs/op
+// BenchmarkPuzzle2-12    	   16882	     67969 ns/op	  162433 B/op	     139 allocs/op
 func BenchmarkPuzzle2(b *testing.B) {
 	var result int
 	for b.Loop() {

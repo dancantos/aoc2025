@@ -35,30 +35,35 @@ func puzzle1(grid Grid[int]) int {
 }
 
 func puzzle2(grid Grid[int]) int {
+	// init all memory needed
+	auxGrid := grid.clone()
+	var tmpGrid Grid[int]
+
 	iter := func(g Grid[int]) (int, Grid[int]) {
+		copyGrid(auxGrid, grid)
 		remCount := 0
-		newGrid := g.clone()
-		for x, y := range grid.coords() {
-			if grid.get(x, y) == 0 {
+		for x, y := range g.coords() {
+			if g.get(x, y) == 0 {
 				continue
 			}
 
 			count := 0
-			for n := range grid.neighbors(x, y) {
+			for n := range g.neighbors(x, y) {
 				count += n
 			}
 
 			if count < 4 {
 				remCount += 1
-				newGrid.set(x, y, 0)
+				auxGrid.set(x, y, 0)
 			}
 		}
-		return remCount, newGrid
+		return remCount, auxGrid
 	}
 
 	var remCount, totalRemoved int
 	for {
-		remCount, grid = iter(grid)
+		remCount, tmpGrid = iter(grid)
+		copyGrid(grid, tmpGrid)
 		if remCount == 0 {
 			break
 		}
@@ -120,6 +125,12 @@ func (g Grid[T]) clone() Grid[T] {
 		newGrid = append(newGrid, slices.Clone(row))
 	}
 	return Grid[T]{newGrid, g.xmax, g.ymax}
+}
+
+func copyGrid[T any](dst, src Grid[T]) {
+	for i, row := range src.grid {
+		copy(dst.grid[i], row)
+	}
 }
 
 func (g Grid[T]) Print(out io.Writer) {
