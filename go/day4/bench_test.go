@@ -11,12 +11,20 @@ var anchor int
 // goarch: arm64
 // pkg: github.com/dancantos/aoc2025/go/day4
 // cpu: Apple M4 Pro
-// BenchmarkPuzzle1-12    	   11412	    105891 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkPuzzle1/puzzle-12         	   11646	    100788 ns/op	       0 B/op	       0 allocs/op
+// BenchmarkPuzzle1/bonus-12          	    5491	    216855 ns/op	       0 B/op	       0 allocs/op
 func BenchmarkPuzzle1(b *testing.B) {
 	var result int
-	for b.Loop() {
-		result = puzzle1(input)
-	}
+	b.Run("puzzle", func(b *testing.B) {
+		for b.Loop() {
+			result = puzzle1(input)
+		}
+	})
+	b.Run("bonus", func(b *testing.B) {
+		for b.Loop() {
+			result = puzzle1(bonus)
+		}
+	})
 	anchor = result
 }
 
