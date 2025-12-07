@@ -24,9 +24,9 @@ var anchor int
 // goarch: arm64
 // pkg: github.com/dancantos/aoc2025/go/day7
 // cpu: Apple M4 Pro
-// BenchmarkPuzzle1/solve_with_file_io-12         	    9812	    118598 ns/op	   26097 B/op	     154 allocs/op
-// BenchmarkPuzzle1/solve_while_reading-12        	   34195	     36183 ns/op	   25816 B/op	     149 allocs/op
-// BenchmarkPuzzle1/solve_after_read-12           	   35368	     30763 ns/op	    1272 B/op	       6 allocs/op
+// BenchmarkPuzzle1/solve_with_file_io-12         	   12342	     95970 ns/op	   26161 B/op	     156 allocs/op
+// BenchmarkPuzzle1/solve_while_reading-12        	   65809	     18363 ns/op	   25880 B/op	     151 allocs/op
+// BenchmarkPuzzle1/solve_after_read-12           	  530677	      2235 ns/op	    1336 B/op	       8 allocs/op
 func BenchmarkPuzzle1(b *testing.B) {
 	var result int
 	b.Run("solve_with_file_io", func(b *testing.B) {
@@ -59,9 +59,9 @@ func BenchmarkPuzzle1(b *testing.B) {
 // goarch: arm64
 // pkg: github.com/dancantos/aoc2025/go/day7
 // cpu: Apple M4 Pro
-// BenchmarkPuzzle2/solve_with_file_io-12         	   10092	    117921 ns/op	   27265 B/op	     155 allocs/op
-// BenchmarkPuzzle2/solve_while_reading-12        	   33218	     35798 ns/op	   26984 B/op	     150 allocs/op
-// BenchmarkPuzzle2/solve_after_read-12           	   38773	     28726 ns/op	    2440 B/op	       7 allocs/op
+// BenchmarkPuzzle2/solve_with_file_io-12         	   12177	     98405 ns/op	   27369 B/op	     158 allocs/op
+// BenchmarkPuzzle2/solve_while_reading-12        	   59980	     20092 ns/op	   27088 B/op	     153 allocs/op
+// BenchmarkPuzzle2/solve_after_read-12           	  482778	      2391 ns/op	    2544 B/op	      10 allocs/op
 func BenchmarkPuzzle2(b *testing.B) {
 	var result int
 

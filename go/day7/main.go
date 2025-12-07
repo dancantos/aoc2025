@@ -23,24 +23,48 @@ const (
 )
 
 func puzzle1(lines iter.Seq[string]) int {
-	// pop the first line
+	// pop the first line, record the starting position
 	var prev []rune
-	lines(func(line string) bool { prev = []rune(line); return false })
-	runes := make([]rune, len(prev))
+	var startPos int
+	var l int
+	lines(func(line string) bool {
+		l = len(line)
+		prev = make([]rune, l)
+		for i, char := range line {
+			if char == START {
+				startPos = i
+				prev[i] = ACTIVE
+				return false
+			}
+		}
+		return false
+	})
+
+	// Main solve
+	runes := make([]rune, l)
 	splitCount := 0
+	minPos, maxPos := startPos, startPos // search boundary, increment as we find splitters
 	for line := range lines {
-		for j, char := range line {
-			prevChar := prev[j]
+		for i := minPos; i <= maxPos; i++ {
+			// for i, char := range line {
+			char := line[i]
+			prevChar := prev[i]
 			switch {
 			case char == EMPTY && prevChar == ACTIVE:
-				runes[j] = ACTIVE
+				runes[i] = ACTIVE
 			case char == SPLITTER && prevChar == ACTIVE:
 				splitCount++
-				runes[j-1] = ACTIVE
-				runes[j] = SPLITTER
-				runes[j+1] = ACTIVE
-			case char == EMPTY && prevChar == START: // make this condition last, is will only run once at the start - reduce branching
-				runes[j] = ACTIVE
+				runes[i-1] = ACTIVE
+				runes[i] = SPLITTER
+				runes[i+1] = ACTIVE
+
+				// expand boundary if splits past it
+				if i == minPos && minPos > 0 {
+					minPos--
+				}
+				if i == maxPos && maxPos < l {
+					maxPos++
+				}
 			}
 		}
 		copy(prev, runes)
@@ -49,34 +73,56 @@ func puzzle1(lines iter.Seq[string]) int {
 }
 
 func puzzle2(lines iter.Seq[string]) int {
-	// pop the first line
+	// pop the first line, record the starting position
 	var prev []rune
-	lines(func(line string) bool { prev = []rune(line); return false })
+	// tracks number of paths to a position
+	var multiplicity []int
+	var startPos int
+	var l int
+	lines(func(line string) bool {
+		l = len(line)
+		prev = make([]rune, l)
+		multiplicity = make([]int, len(prev))
+		for i, char := range line {
+			if char == START {
+				startPos = i
+				prev[i] = ACTIVE
+				multiplicity[i] = 1
+				return false
+			}
+		}
+		return false
+	})
 
 	// total path count
 	pathCount := 1
-	// tracks number of paths to a position
-	multiplicity := make([]int, len(prev))
 	runes := make([]rune, len(prev))
+	minPos, maxPos := startPos, startPos // search boundary, increment as we find splitters
 	for line := range lines {
-		for j, char := range line {
-			prevChar := prev[j]
+		for i := minPos; i <= maxPos; i++ {
+			char := line[i]
+			prevChar := prev[i]
 			switch {
 			case char == EMPTY && prevChar == ACTIVE:
-				runes[j] = ACTIVE
+				runes[i] = ACTIVE
 			case char == SPLITTER && prevChar == ACTIVE:
-				pathCount += multiplicity[j] // paths to j split, so we have mult[j]
-				// update active and mult states
-				runes[j-1] = ACTIVE
-				runes[j] = SPLITTER
-				runes[j+1] = ACTIVE
-				multiplicity[j-1] += multiplicity[j]
-				multiplicity[j+1] += multiplicity[j]
-				multiplicity[j] = 0 // split, no longer active
+				pathCount += multiplicity[i] // paths to i split, so we have mult[i]
 
-			case char == EMPTY && prevChar == START: // make this condition last, is will only run once at the start - reduce branching
-				runes[j] = ACTIVE
-				multiplicity[j] = 1
+				// update active and mult states
+				runes[i-1] = ACTIVE
+				runes[i] = SPLITTER
+				runes[i+1] = ACTIVE
+				multiplicity[i-1] += multiplicity[i]
+				multiplicity[i+1] += multiplicity[i]
+				multiplicity[i] = 0 // split, no longer active
+
+				// expand boundary if splits past it
+				if i == minPos && minPos > 0 {
+					minPos--
+				}
+				if i == maxPos && maxPos < l {
+					maxPos++
+				}
 			}
 		}
 		copy(prev, runes)
