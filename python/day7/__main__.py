@@ -61,8 +61,8 @@ def printlines(lines):
 lines = read("input/day7/puzzle.txt")
 # for line in lines:
 #     print(line)
-# print(puzzle1(lines))
-print(puzzle2(lines))
+print(puzzle1(lines))
+# print(puzzle2(lines))
 # printlines(lines)
 
 
