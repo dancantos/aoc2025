@@ -11,6 +11,28 @@ def read(filename):
     problems = [ [ nums[i][j] for i in range(len(nums)) ] for j in range(len(nums[0])) ]
     return problems, ops
 
+def compute(nums, op):
+    if op == '*':
+        fn = lambda x, y: x*y
+        init = 1
+    if op == '+':
+        fn = lambda x, y: x+y
+        init = 0
+    if op == '-':
+        fn = lambda x, y: x-y
+        init = 0
+
+    for n in nums:
+        init = fn(init, n)
+    return init
+
+def str_to_num(s):
+    n = 0
+    size = len(s)
+    for i in range(size-1, -1, -1):
+        n += int(s[i]) * 10**i
+    return n
+
 def read2(filename):
     with open(filename) as f:
         lines = [ line for line in f ]
@@ -38,32 +60,11 @@ def read2(filename):
     # for each problem: transpose -> reverse -> to_num gives us the numbers for each problem
     # explanation: if we treat each problem array as a matrix of characters, then rotating the matrix gives us the numbers we need
     # the inputs are arrays of strings, so we need to index into them, then reconstruct the results as strings as we go.
-    problems = [ [ str_to_num(''.join([ p[i][j] for i in range(len(p)) ]).strip()[::-1]) for j in range(len(p[0])) ] for p in problems ]
+    ops = lines[-1].strip().split()
+    result = sum([ compute([ str_to_num(''.join([ p[i][j] for i in range(len(p)) ]).strip()[::-1]) for j in range(len(p[0])) ], ops[pi]) for pi, p in enumerate(problems) ])
 
     # the last line of operators still need to be processed
-    return problems, lines[-1].strip().split()
-
-def str_to_num(s):
-    n = 0
-    size = len(s)
-    for i in range(size-1, -1, -1):
-        n += int(s[i]) * 10**i
-    return n
-
-def compute(nums, op):
-    if op == '*':
-        fn = lambda x, y: x*y
-        init = 1
-    if op == '+':
-        fn = lambda x, y: x+y
-        init = 0
-    if op == '-':
-        fn = lambda x, y: x-y
-        init = 0
-
-    for n in nums:
-        init = fn(init, n)
-    return init
+    return result
 
 def puzzle(problems, ops):
     result = 0
@@ -72,6 +73,6 @@ def puzzle(problems, ops):
     return result
 
 p, o = read("input/day6/puzzle.txt")
-p2, o2 = read2("input/day6/puzzle.txt")
+# p2, o2 = read2("input/day6/puzzle.txt")
 print("Puzzle 1: ", puzzle(p, o))
-print("Puzzle 2: ", puzzle(p2, o2))
+print("Puzzle 2: ", read2("input/day6/puzzle.txt"))
