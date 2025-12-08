@@ -57,14 +57,12 @@ def read2(filename):
     # last line
     problems.append([ line[col_start:-1] for line in lines[:-1] ])
 
+    ops = lines[-1].strip().split()
     # for each problem: transpose -> reverse -> to_num gives us the numbers for each problem
     # explanation: if we treat each problem array as a matrix of characters, then rotating the matrix gives us the numbers we need
     # the inputs are arrays of strings, so we need to index into them, then reconstruct the results as strings as we go.
-    ops = lines[-1].strip().split()
-    result = sum([ compute([ str_to_num(''.join([ p[i][j] for i in range(len(p)) ]).strip()[::-1]) for j in range(len(p[0])) ], ops[pi]) for pi, p in enumerate(problems) ])
-
-    # the last line of operators still need to be processed
-    return result
+    # we then wrap up the computation and sum the results as we go
+    return sum([ compute([ str_to_num(''.join([ p[i][j] for i in range(len(p)) ]).strip()[::-1]) for j in range(len(p[0])) ], ops[pi]) for pi, p in enumerate(problems) ])
 
 def puzzle(problems, ops):
     result = 0
