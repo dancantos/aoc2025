@@ -60,9 +60,10 @@ def read2(filename):
     ops = lines[-1].strip().split()
     # for each problem: transpose -> reverse -> to_num gives us the numbers for each problem
     # explanation: if we treat each problem array as a matrix of characters, then rotating the matrix gives us the numbers we need
+    # this rotation is achieved by a transpose + flip (2 reflections on different axes), giving us an easy way to encode it simply by smart choice of indexes
     # the inputs are arrays of strings, so we need to index into them, then reconstruct the results as strings as we go.
     # we then wrap up the computation and sum the results as we go
-    return sum([ compute([ str_to_num(''.join([ p[i][j] for i in range(len(p)) ]).strip()[::-1]) for j in range(len(p[0])) ], ops[pi]) for pi, p in enumerate(problems) ])
+    return sum([ compute([ str_to_num(''.join([ p[-i-1][j] for i in range(len(p)) ]).strip()) for j in range(len(p[0])) ], ops[pi]) for pi, p in enumerate(problems) ])
 
 def puzzle(problems, ops):
     result = 0
