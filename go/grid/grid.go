@@ -59,49 +59,36 @@ func (g Grid[T]) Print(out io.Writer) {
 
 func (g Grid[T]) Neighbors(x, y int) iter.Seq2[Vec2, T] {
 	return func(yield func(Vec2, T) bool) {
-		if x > 0 {
-			if !yield(Vec2{x - 1, y}, g.Get(x-1, y)) {
-				return
-			}
+		// horizontal
+		if x > 0 && !yield(Vec2{x - 1, y}, g.Get(x-1, y)) {
+			return
 		}
-		if x < g.bounds.X-1 {
-			if !yield(Vec2{x + 1, y}, g.Get(x+1, y)) {
-				return
-			}
-		}
-		if y > 0 {
-			if !yield(Vec2{x, y - 1}, g.Get(x, y-1)) {
-				return
-			}
-		}
-		if y < g.bounds.Y-1 {
-			if !yield(Vec2{x, y + 1}, g.Get(x, y+1)) {
-				return
-			}
+		if x < g.bounds.X-1 && !yield(Vec2{x + 1, y}, g.Get(x+1, y)) {
+			return
 		}
 
-		if x > 0 && y > 0 {
-			if !yield(Vec2{x - 1, y - 1}, g.Get(x-1, y-1)) {
-				return
-			}
+		// vertical
+		if y > 0 && !yield(Vec2{x, y - 1}, g.Get(x, y-1)) {
+			return
 		}
-		if x < g.bounds.X-1 && y > 0 {
-			if !yield(Vec2{x + 1, y - 1}, g.Get(x+1, y-1)) {
-				return
-			}
+		if y < g.bounds.Y-1 && !yield(Vec2{x, y + 1}, g.Get(x, y+1)) {
+			return
 		}
-		if x > 0 && y < g.bounds.Y-1 {
-			if !yield(Vec2{x - 1, y + 1}, g.Get(x-1, y+1)) {
-				return
-			}
+
+		// diagonals
+		if x > 0 && y > 0 && !yield(Vec2{x - 1, y - 1}, g.Get(x-1, y-1)) {
+			return
 		}
-		if x < g.bounds.X-1 && y < g.bounds.Y-1 {
-			if !yield(Vec2{x + 1, y + 1}, g.Get(x+1, y+1)) {
-				return
-			}
+		if x < g.bounds.X-1 && y > 0 && !yield(Vec2{x + 1, y - 1}, g.Get(x+1, y-1)) {
+			return
+		}
+		if x > 0 && y < g.bounds.Y-1 && !yield(Vec2{x - 1, y + 1}, g.Get(x-1, y+1)) {
+			return
+		}
+		if x < g.bounds.X-1 && y < g.bounds.Y-1 && !yield(Vec2{x + 1, y + 1}, g.Get(x+1, y+1)) {
+			return
 		}
 	}
-
 }
 
 func NewGrid[T any](input [][]T) Grid[T] {
