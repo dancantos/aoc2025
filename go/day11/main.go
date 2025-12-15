@@ -7,7 +7,6 @@ import (
 	"iter"
 	"maps"
 	"os"
-	"slices"
 	"strings"
 
 	"gonum.org/v1/gonum/mat"
@@ -45,14 +44,19 @@ func _dfs(g Graph[string], src, dst string, seen Set[string]) int {
 }
 
 func puzzle2(g Graph[string]) int {
-	l := len(g) + 1
+	l := len(g) + 1 // make room for the out vertex
 	base := mat.NewDense(l, l, nil)
 
 	svrIndex := 0
 	dacIndex := 0
 	fftIndex := 0
 	outIndex := l - 1
-	vlist := slices.Collect(g.Vertices())
+	vlist := make([]string, len(g))
+	i := 0
+	for v := range g.Vertices() {
+		vlist[i] = v
+		i++
+	}
 	for i, k := range vlist {
 		// Record the indexes that represent our vertices of interest
 		switch k {
